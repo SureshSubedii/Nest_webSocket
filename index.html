@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Chat</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+</head>
+<body>
+  <h1>WebSocket Chat</h1>
+  <input type="text" id="messageInput" placeholder="Type a message">
+  <button id="sendMessageButton">Send</button>
+  <div id="messages"></div>
+
+  <script>
+    const socket = io.connect('http://localhost:3000'); // Change the URL to match your WebSocket server's URL
+
+    console.log('Before event listener setup');
+socket.on('connect', (event) => {
+  console.log('WebSocket connection opened');
+});
+
+    socket.on('newMessage', (event) => {
+      const messagesDiv = document.getElementById('messages');
+      const message = document.createElement('p');
+      message.textContent = event.data;
+      messagesDiv.appendChild(message);
+    });
+
+    socket.on('close', (event) => {
+      console.log('WebSocket connection closed');
+    });
+
+    function sendMessage() {
+      const messageInput = document.getElementById('messageInput');
+      const message = messageInput.value;
+      socket.emit('newMessage', { data: message }); // Use emit to specify the event name
+      messageInput.value = '';
+    }
+
+    const sendMessageButton = document.getElementById('sendMessageButton');
+    sendMessageButton.addEventListener('click', ()=>sendMessage());
+  </script>
+</body>
+</html>
